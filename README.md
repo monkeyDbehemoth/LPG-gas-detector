@@ -40,8 +40,4 @@ Upload the provided Arduino code using Arduino IDE.
 
 Power the system and test it by exposing the sensor to LPG (carefully, in a safe setup).
 
-📂 Project Structure
-LPG-Gas-Detector/
-├── code/              # Arduino source code
-├── circuit-diagram/   # Circuit connection diagram
-└── README.md          # Project documentation
+
