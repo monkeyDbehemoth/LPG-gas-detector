@@ -1,0 +1,68 @@
+
+A simple yet effective LPG gas leak detection system designed to enhance safety by continuously monitoring the environment for gas leaks. The system uses a gas sensor (e.g., MQ-series) to detect LPG concentration in the air and triggers an alert (buzzer/LED/display) when dangerous levels are detected.
+
+Features
+
+Detects LPG gas concentration in real-time.
+
+Alerts users via buzzer/LED when leakage is detected.
+
+Can be integrated with microcontrollers (Arduino, ESP32, etc.).
+
+Potential for extension with IoT notifications (SMS/Email).
+
+Tech Stack / Components
+
+Hardware: Gas Sensor (MQ-2/MQ-5), Arduino/ESP board, Buzzer, LEDs.
+
+Software: Arduino IDE (C/C++).
+
+ 
+// Define pin numbers const int gasSensorPin = A0;     // MQ-2 gas sensor analog pin const int buzzerPin = 13;         // Buzzer pin const int servoPin = 9;          // Servo motor pin const int relayPin = 8;         // Relay pin to control the fan 
+ 
+Servo myServo;  // Servo motor object // Threshold for gas detection const int threshold = 300;  // Adjust based on calibration 
+ 
+void setup() {   // Initialize the pins 
+  pinMode(buzzerPin, OUTPUT);  // Set buzzer as output   pinMode(relayPin, OUTPUT);   // Set relay pin as output 
+   
+  // Attach servo to pin 9   myServo.attach(servoPin); 
+   
+  // Ensure the relay (fan) is initially off   digitalWrite(relayPin, HIGH);  // Set relay to HIGH to keep the fan off initially 
+   
+  // Start the serial communication for debugging 
+  Serial.begin(9600); 
+  Serial.println("LPG Gas Detection System Initialized"); 
+   
+  // Move servo to initial position (Gas regulator ON)   myServo.write(0);  // Servo in "on" position (0 degrees) } 
+ 
+void loop() { 
+  // Read the gas sensor value   int gasValue = analogRead(gasSensorPin); 
+   
+  // Print sensor value to the serial monitor for debugging 
+  Serial.print("Gas Sensor Value: "); 
+  Serial.println(gasValue); 
+   
+  // Check if gas concentration exceeds the threshold   if (gasValue > threshold) { 
+    // If gas is detected, activate the buzzer, fan, and servo     digitalWrite(relayPin, HIGH);    // Turn on the fan (relay) 
+    myServo.write(120);  // Move servo to 90 degrees (off position, gas regulator 
+OFF) 
+     
+    Serial.println("Gas detected! Activating buzzer and fan."); 
+     
+    // danger siren sound pattern     for (int i = 0; i < 3; i++) {  // Repeat siren effect 3 times (or adjust the number of repetitions) 
+      // Rise in pitch (low to high frequency)       for (int freq = 500; freq <= 1500; freq += 20) {  // Gradually increase the frequency         tone(buzzerPin, freq);          delay(10);  // Small delay for smooth transition 
+      } 
+      // Fall in pitch (high to low frequency)       for (int freq = 1500; freq >= 500; freq -= 20) {  // Gradually decrease the frequency 
+        tone(buzzerPin, freq);          delay(10);  // Small delay for smooth transition 
+      } 
+    } 
+  } else { 
+    // If no gas is detected, deactivate the buzzer, fan, and reset servo     digitalWrite(relayPin, LOW);   // Turn off the fan (relay)     myServo.write(0);  // Reset servo to 0 degrees (on position, gas regulator ON) 
+     
+    Serial.println("No gas detected. System idle."); 
+     
+    // Stop any sound from buzzer if gas is not detected     noTone(buzzerPin); 
+  } 
+   
+  delay(1000);  // Delay for 1 second before the next reading 
+} 
